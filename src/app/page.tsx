@@ -2,12 +2,13 @@
 
 import { useQuery } from "@tanstack/react-query"
 import { client } from "@/lib/client"
+import Link from "next/link";
 
 export default function Home() {
   const query = useQuery({
-    queryKey: ['todos', 1],
+    queryKey: ['todos'],
     queryFn: async () => {
-      const response = await client.todo.getById.$get({ id: 1 });
+      const response = await client.todo.getAll.$get();
       return response.json();
     }
   })
@@ -18,9 +19,13 @@ export default function Home() {
 
   return (
     <div>
-      <p>Todo #{query.data?.id}</p>
-      <p>Name: {query.data?.name}</p>
-      <p>Type: {query.data?.type}</p>
+      {query.data?.todos.map((todo) => (
+        <Link href={`/${todo.id}`} key={todo.id} className="cursor-pointer">
+          <p>Todo #{todo.id}</p>
+          <p>Name: {todo.name}</p>
+          <p>Type: {todo.type}</p>
+        </Link>
+      ))}
     </div>
   )
 }

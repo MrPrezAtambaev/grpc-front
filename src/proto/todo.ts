@@ -21,6 +21,9 @@ import {
 
 export const protobufPackage = "todo";
 
+export interface FindAllHeroConditions {
+}
+
 export interface FindOneHeroConditions {
   id: number;
 }
@@ -30,6 +33,53 @@ export interface Todo {
   name: string;
   type: string;
 }
+
+export interface Todos {
+  todos: Todo[];
+}
+
+function createBaseFindAllHeroConditions(): FindAllHeroConditions {
+  return {};
+}
+
+export const FindAllHeroConditions: MessageFns<FindAllHeroConditions> = {
+  encode(_: FindAllHeroConditions, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): FindAllHeroConditions {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseFindAllHeroConditions();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): FindAllHeroConditions {
+    return {};
+  },
+
+  toJSON(_: FindAllHeroConditions): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<FindAllHeroConditions>, I>>(base?: I): FindAllHeroConditions {
+    return FindAllHeroConditions.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<FindAllHeroConditions>, I>>(_: I): FindAllHeroConditions {
+    const message = createBaseFindAllHeroConditions();
+    return message;
+  },
+};
 
 function createBaseFindOneHeroConditions(): FindOneHeroConditions {
   return { id: 0 };
@@ -181,6 +231,64 @@ export const Todo: MessageFns<Todo> = {
   },
 };
 
+function createBaseTodos(): Todos {
+  return { todos: [] };
+}
+
+export const Todos: MessageFns<Todos> = {
+  encode(message: Todos, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.todos) {
+      Todo.encode(v!, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): Todos {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTodos();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.todos.push(Todo.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Todos {
+    return { todos: globalThis.Array.isArray(object?.todos) ? object.todos.map((e: any) => Todo.fromJSON(e)) : [] };
+  },
+
+  toJSON(message: Todos): unknown {
+    const obj: any = {};
+    if (message.todos?.length) {
+      obj.todos = message.todos.map((e) => Todo.toJSON(e));
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Todos>, I>>(base?: I): Todos {
+    return Todos.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Todos>, I>>(object: I): Todos {
+    const message = createBaseTodos();
+    message.todos = object.todos?.map((e) => Todo.fromPartial(e)) || [];
+    return message;
+  },
+};
+
 export type TodoServiceService = typeof TodoServiceService;
 export const TodoServiceService = {
   findOne: {
@@ -192,10 +300,20 @@ export const TodoServiceService = {
     responseSerialize: (value: Todo) => Buffer.from(Todo.encode(value).finish()),
     responseDeserialize: (value: Buffer) => Todo.decode(value),
   },
+  findAll: {
+    path: "/todo.TodoService/FindAll",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: FindAllHeroConditions) => Buffer.from(FindAllHeroConditions.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => FindAllHeroConditions.decode(value),
+    responseSerialize: (value: Todos) => Buffer.from(Todos.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => Todos.decode(value),
+  },
 } as const;
 
 export interface TodoServiceServer extends UntypedServiceImplementation {
   findOne: handleUnaryCall<FindOneHeroConditions, Todo>;
+  findAll: handleUnaryCall<FindAllHeroConditions, Todos>;
 }
 
 export interface TodoServiceClient extends Client {
@@ -213,6 +331,21 @@ export interface TodoServiceClient extends Client {
     metadata: Metadata,
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: Todo) => void,
+  ): ClientUnaryCall;
+  findAll(
+    request: FindAllHeroConditions,
+    callback: (error: ServiceError | null, response: Todos) => void,
+  ): ClientUnaryCall;
+  findAll(
+    request: FindAllHeroConditions,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: Todos) => void,
+  ): ClientUnaryCall;
+  findAll(
+    request: FindAllHeroConditions,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: Todos) => void,
   ): ClientUnaryCall;
 }
 

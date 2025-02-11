@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { j, publicProcedure } from "../jstack";
-import { Todo, TodoServiceClient } from "@/proto/todo";
+import { Todo, Todos, TodoServiceClient } from "@/proto/todo";
 import { ChannelCredentials } from "@grpc/grpc-js";
 
 export const todoRouter = j.router({
@@ -17,5 +17,17 @@ export const todoRouter = j.router({
       });
 
       return c.superjson(response);
-    })
+    }),
+
+  getAll: publicProcedure.query(async ({ c }) => {
+    const channelCredentials = ChannelCredentials.createInsecure()
+    const client = new TodoServiceClient('localhost:50051', channelCredentials);
+    const response = await new Promise<Todos>((resolve, reject) => {
+      client.findAll({}, (err, res) => {
+        if (err) return reject(err);
+        resolve(res);
+      });
+    });
+    return c.superjson(response);
+  }),
 });
