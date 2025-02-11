@@ -1,5 +1,4 @@
 import { j } from "./jstack"
-import { postRouter } from "./routers/post-router"
 import { todoRouter } from "./routers/todo-router"
 
 /**
@@ -19,7 +18,6 @@ const api = j
  * All routers in /server/routers should be added here manually.
  */
 const appRouter = j.mergeRouters(api, {
-  post: postRouter,
   todo: todoRouter,
 })
 
